@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang='en'>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>NHL Stats - About</title>
+    <link href="style.css" rel="stylesheet" type="text/css">
+		<!-- Load an icon library to show a hamburger menu (bars) on small screens -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+		<link rel="shortcut icon" href="//www-league.nhlstatic.com/nhl.com/builds/site-core/b29c5604a47170b70efb4fecb5757f59632443d9_1612235767/images/favicon.ico">
+  </head>
+  <body>
+		<div id='header'><!--<img id='headerImg' src="https://upload.wikimedia.org/wikipedia/en/thumb/3/3a/05_NHL_Shield.svg/1200px-05_NHL_Shield.svg.png">--></div>
+		<!--Responsive nav bar from w3schools-->
+		<div class="topnav" id="myTopnav">
+  		<a href="index.html" class="active">Home</a>
+  		<a href="about.html">About</a>
+  		<a href="leaders.html">League Leaders</a>
+  		<a href="teams.html">Teams</a>
+  		<a href="playerSearch.html">Player Search</a>
+  		<a href="compare.html">Compare Player</a>
+  		<a href="funStats.html">Fun Stats</a>
+ 			<a href="javascript:void(0);" class="icon" onclick="myFunction()">
+  		  <i class="fa fa-bars"></i>
+  		</a>
+		</div>
+		<div id='content'>
+			<p>This website is powered by the NHL API, found <a href='https://statsapi.web.nhl.com/api' id='apiLink' target="_blank">here</a>. My website pulls data from this API, and then stores the data into multiple arrays. This data is then presented to you, the user, in ways that are much easier to read than lines and lines of numbers. I decided to make this website because I am very interested in NHL stats, as well as the NHL API and what it can do. Also, I'd like to give a <i>huge</i> thanks to <a href='https://hackernoon.com/retrieving-hockey-stats-from-the-nhls-undocumented-api-zz3003wrw' class='creditLinks' target="_blank">Nick Kinlen</a>, <a href='https://blog.logrocket.com/how-to-make-http-requests-like-a-pro-with-axios/' class='creditLinks' target="_blank">Faraz Kelhini</a>, and <a href='https://gitlab.com/dword4/nhlapi/-/blob/master/stats-api.md' class='creditLinks' target="_blank">Drew Hynes</a> for their resources. They really helped me understand the ins and outs of the NHL API, and without them, I could not have completed this project.</p>
+			<div id='iframeDiv'>
+				<iframe src="https://hackernoon.com/retrieving-hockey-stats-from-the-nhls-undocumented-api-zz3003wrw" title="Hackernoon" id='hackernoon'></iframe>
+				<iframe src="https://blog.logrocket.com/how-to-make-http-requests-like-a-pro-with-axios/" title="LogRocket" id='logRocket'></iframe>
+			</div>
+		</div>
+		<div id='footer'><p id='copy'>&copy; Jason Gillanders 2021, All Rights Reserved</p></div>
+		<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  </body>
+</html>
