@@ -417,8 +417,11 @@ function getFantasy(playerLink,playerName) {
 				fantasyArray.sort(numberSort);
 			}
 				top10 = fantasyArray.filter(filterTop10);
-				top10Names = getCol(top10, 0)
+				top10Names = getCol(top10, 0);
 				top10Fantasy = getCol(top10, 1);
+				top500 = fantasyArray.filter(filterTop500);
+				top500Names = getCol(top500, 0);
+				top500Fantasy = getCol(top500, 1);
 			  //document.getElementById("showFunStats").innerHTML = top10;
 			  	fantasyTable = true;
 				defensiveTable = false;
@@ -438,6 +441,10 @@ function numberSort(col1, col2) {
 //a simple top 10 filter
 function filterTop10(value,index,array) {
 	return index<10;
+}
+
+function filterTop500(value,index,array) {
+	return index<500;
 }
 
 //draws the chart for the clutch stats
@@ -664,16 +671,37 @@ function drawChartDefensive() {
 function drawChartFantasy() {
 	var data = google.visualization.arrayToDataTable([
   ['Player Name', "Fantasy Points", { role: 'style' }],
-  [top10Names[0], top10Fantasy[0], 'fill-color: goldenrod;'],
-	[top10Names[1], top10Fantasy[1], 'fill-color: silver;'],
-	[top10Names[2], top10Fantasy[2], 'fill-color: sienna;'],
-	[top10Names[3], top10Fantasy[3], 'fill-color: royalblue;'] ,
-	[top10Names[4], top10Fantasy[4], 'fill-color: royalblue;'],
-	[top10Names[5], top10Fantasy[5], 'fill-color: royalblue;'],
-	[top10Names[6], top10Fantasy[6], 'fill-color: royalblue;'],
-	[top10Names[7], top10Fantasy[7], 'fill-color: royalblue;'],
-	[top10Names[8], top10Fantasy[8], 'fill-color: royalblue;'],
-	[top10Names[9], top10Fantasy[9], 'fill-color: royalblue;']
+  [top500Names[0], top500Fantasy[0], 'fill-color: goldenrod;'],
+	[top500Names[1], top500Fantasy[1], 'fill-color: silver;'],
+	[top500Names[2], top500Fantasy[2], 'fill-color: sienna;'],
+	[top500Names[3], top500Fantasy[3], 'fill-color: royalblue;'] ,
+	[top500Names[4], top500Fantasy[4], 'fill-color: royalblue;'],
+	[top500Names[5], top500Fantasy[5], 'fill-color: royalblue;'],
+	[top500Names[6], top500Fantasy[6], 'fill-color: royalblue;'],
+	[top500Names[7], top500Fantasy[7], 'fill-color: royalblue;'],
+	[top500Names[8], top500Fantasy[8], 'fill-color: royalblue;'],
+	[top500Names[9], top500Fantasy[9], 'fill-color: royalblue;'],
+	[top500Names[10], top500Fantasy[10], 'fill-color: royalblue;'] ,
+	[top500Names[11], top500Fantasy[11], 'fill-color: royalblue;'],
+	[top500Names[12], top500Fantasy[12], 'fill-color: royalblue;'],
+	[top500Names[13], top500Fantasy[13], 'fill-color: royalblue;'],
+	[top500Names[14], top500Fantasy[14], 'fill-color: royalblue;'],
+	[top500Names[15], top500Fantasy[15], 'fill-color: royalblue;'],
+	[top500Names[16], top500Fantasy[16], 'fill-color: royalblue;'],
+	[top500Names[17], top500Fantasy[17], 'fill-color: royalblue;'] ,
+	[top500Names[18], top500Fantasy[18], 'fill-color: royalblue;'],
+	[top500Names[19], top500Fantasy[19], 'fill-color: royalblue;'],
+	[top500Names[20], top500Fantasy[20], 'fill-color: royalblue;'],
+	[top500Names[21], top500Fantasy[21], 'fill-color: royalblue;'],
+	[top500Names[22], top500Fantasy[22], 'fill-color: royalblue;'],
+	[top500Names[23], top500Fantasy[23], 'fill-color: royalblue;'],
+	[top500Names[24], top500Fantasy[24], 'fill-color: royalblue;'] ,
+	[top500Names[25], top500Fantasy[25], 'fill-color: royalblue;'],
+	[top500Names[26], top500Fantasy[26], 'fill-color: royalblue;'],
+	[top500Names[27], top500Fantasy[27], 'fill-color: royalblue;'],
+	[top500Names[28], top500Fantasy[28], 'fill-color: royalblue;'],
+	[top500Names[29], top500Fantasy[29], 'fill-color: royalblue;'],
+	[top500Names[30], top500Fantasy[30], 'fill-color: royalblue;']
 	]);
 	var options = {'title':'Best Fantasy Players',
 	'hAxis': {
