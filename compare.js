@@ -380,7 +380,7 @@ function allRostersSearch(teamLink,playerSearchName,whichCompare) {
 		})
 }
 function getStatsSearch(playerLink,playerName,whichCompare) {
-	axios.get('https://statsapi.web.nhl.com/' + playerLink + '/stats?stats=statsSingleSeason&season=20212022')
+	axios.get('https://statsapi.web.nhl.com/' + playerLink + '/stats?stats=statsSingleSeason&season=20222023')
 		.then((response) => {
 			console.log("GOT TO GETSTATSSEARCH");
 			//if it is for the first search bar

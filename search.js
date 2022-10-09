@@ -254,7 +254,7 @@ function allRostersSearch(teamLink,playerInputName) {
 		})
 }
 function getPlayerSearchStats(playerLink, playerName) {
-	axios.get('https://statsapi.web.nhl.com/' + playerLink + '/stats?stats=statsSingleSeason&season=20212022')
+	axios.get('https://statsapi.web.nhl.com/' + playerLink + '/stats?stats=statsSingleSeason&season=20222023')
 		.then((response) => {
 			//playerNameArray.push(playerName);
 			//playerPointsArray.push(response.data.stats[0].splits[0].stat.points);

@@ -222,7 +222,7 @@ function allRostersFantasy(teamLink) {
 		})
 }
 function getClutchStats(playerLink,playerName) {
-	axios.get('https://statsapi.web.nhl.com/' + playerLink + '/stats?stats=statsSingleSeason&season=20212022')
+	axios.get('https://statsapi.web.nhl.com/' + playerLink + '/stats?stats=statsSingleSeason&season=20222023')
 		.then((response) => {
 			//playerNameArray.push(playerName);
 			//playerPointsArray.push(response.data.stats[0].splits[0].stat.points);
@@ -253,7 +253,7 @@ function getClutchStats(playerLink,playerName) {
 		})
 }
 function getSpecialTeams(playerLink,playerName) {
-	axios.get('https://statsapi.web.nhl.com/' + playerLink + '/stats?stats=statsSingleSeason&season=20212022')
+	axios.get('https://statsapi.web.nhl.com/' + playerLink + '/stats?stats=statsSingleSeason&season=20222023')
 		.then((response) => {
 			//the same as above
 			//playerNameArray.push(playerName);
@@ -285,7 +285,7 @@ function getSpecialTeams(playerLink,playerName) {
 		})
 }
 function getOffensive(playerLink,playerName) {
-	axios.get('https://statsapi.web.nhl.com/' + playerLink + '/stats?stats=statsSingleSeason&season=20212022')
+	axios.get('https://statsapi.web.nhl.com/' + playerLink + '/stats?stats=statsSingleSeason&season=20222023')
 		.then((response) => {
 			//the same as above
 			//playerNameArray.push(playerName);
@@ -315,7 +315,7 @@ function getOffensive(playerLink,playerName) {
 		})
 }
 function getGentle(playerLink,playerName) {
-	axios.get('https://statsapi.web.nhl.com/' + playerLink + '/stats?stats=statsSingleSeason&season=20212022')
+	axios.get('https://statsapi.web.nhl.com/' + playerLink + '/stats?stats=statsSingleSeason&season=20222023')
 		.then((response) => {
 			//the same as above
 			//playerNameArray.push(playerName);
@@ -355,7 +355,7 @@ function getGentle(playerLink,playerName) {
 		})
 }
 function getDefensive(playerLink,playerName) {
-	axios.get('https://statsapi.web.nhl.com/' + playerLink + '/stats?stats=statsSingleSeason&season=20212022')
+	axios.get('https://statsapi.web.nhl.com/' + playerLink + '/stats?stats=statsSingleSeason&season=20222023')
 		.then((response) => {
 			//the same as above
 			//playerNameArray.push(playerName);
@@ -390,7 +390,7 @@ function getDefensive(playerLink,playerName) {
 		})
 }
 function getFantasy(playerLink,playerName) {
-	axios.get('https://statsapi.web.nhl.com/' + playerLink + '/stats?stats=statsSingleSeason&season=20212022')
+	axios.get('https://statsapi.web.nhl.com/' + playerLink + '/stats?stats=statsSingleSeason&season=20222023')
 		.then((response) => {
 			//the same as above
 			//playerNameArray.push(playerName);
