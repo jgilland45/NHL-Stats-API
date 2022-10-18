@@ -216,8 +216,14 @@ function allRostersFantasy(teamLink) {
 			//same as above
 			for (var i=0;i<response.data.roster.length;i++)
 			{
+				if (response.data.roster[i].position.code=="C") {
+					var isCenter = true;
+				}
+				else {
+					var isCenter = false;
+				}
 				var names = response.data.roster[i].person.fullName;
-				getFantasy(response.data.roster[i].person.link,names);
+				getFantasy(response.data.roster[i].person.link,names,isCenter);
 			}
 		})
 }
@@ -293,7 +299,7 @@ function getOffensive(playerLink,playerName) {
 			if (response.data.stats[0].splits[0].stat.points!=undefined)
 			{
 				var gamesPlayed = response.data.stats[0].splits[0].stat.games;
-				if (gamesPlayed>4)
+				if (gamesPlayed>0)
 				{
 					var points = response.data.stats[0].splits[0].stat.points;
 					offensiveArray.push([playerName,points/gamesPlayed]);
@@ -323,7 +329,7 @@ function getGentle(playerLink,playerName) {
 			if (response.data.stats[0].splits[0].stat.points!=undefined)
 			{
 				var gamesPlayed = response.data.stats[0].splits[0].stat.games;
-				if (gamesPlayed>4)
+				if (gamesPlayed>0)
 				{
 					var pimString = response.data.stats[0].splits[0].stat.penaltyMinutes;
 					var pim = parseInt(pimString);
@@ -369,7 +375,7 @@ function getDefensive(playerLink,playerName) {
 				var toiString = response.data.stats[0].splits[0].stat.timeOnIcePerGame;
 				var toiArray = toiString.split(":");
 				var toi = (parseInt(toiArray[0])*60) + (parseInt(toiArray[1]));
-				if (gamesPlayed>4)
+				if (gamesPlayed>1)
 				{
 					defensiveArray.push([playerName,(blocked+(plusMinus*0.5)+(hits/10)+(toi/250))/gamesPlayed]);
 				}
@@ -389,7 +395,7 @@ function getDefensive(playerLink,playerName) {
 				google.charts.setOnLoadCallback(drawChartDefensive);
 		})
 }
-function getFantasy(playerLink,playerName) {
+function getFantasy(playerLink,playerName,isCenter) {
 	axios.get('https://statsapi.web.nhl.com/' + playerLink + '/stats?stats=statsSingleSeason&season=20222023')
 		.then((response) => {
 			//the same as above
@@ -407,12 +413,17 @@ function getFantasy(playerLink,playerName) {
 				var shots = response.data.stats[0].splits[0].stat.shots;
 				var faceoffPerc = response.data.stats[0].splits[0].stat.faceOffPct;
 				var shifts = response.data.stats[0].splits[0].stat.shifts;
-				var faceoffWon = faceoffPerc*shifts;
+				if (isCenter) {
+					var faceoffWon = faceoffPerc*shifts;
+				}
+				else {
+					var faceoffWon = 0;
+				}
 				var hits = response.data.stats[0].splits[0].stat.hits;
 				var blocked = response.data.stats[0].splits[0].stat.blocked;
-				if (gamesPlayed>4)
+				if (gamesPlayed>1)
 				{
-					fantasyArray.push([playerName,(goals*5)+(assists*3)+(plusMinus)+(pim*0.5)+(ppp*2)+(shp*4)+(shots*0.9)+(hits)+(blocked)]);
+					fantasyArray.push([playerName,(goals*5)+(assists*3)+(plusMinus)+(pim*0.5)+(ppp*2)+(shp*4)+(shots*0.9)+(hits)+(blocked)+(faceoffWon*0.01*0.42)]);
 				}
 				fantasyArray.sort(numberSort);
 			}

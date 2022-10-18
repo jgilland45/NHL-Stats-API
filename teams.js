@@ -58,7 +58,7 @@ function allTeamStats(teamLink) {
 			//adds the team's name to the desired array
 			teamNamesArray.push(teamName);		
 			//if we've gone through every team
-			if (numIterations==31)//there are only 31 NHL teams 
+			if (numIterations==32)//there are 32 NHL teams 
 			{
 				//hide the loading icon
 				hideLoading();
