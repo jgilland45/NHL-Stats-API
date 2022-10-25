@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
-    <title>NHL Stats - Fun Stats</title>
+    <title>NHL Stats - Fantasy</title>
     <link href="style.css" rel="stylesheet" type="text/css">
 		<!-- Load an icon library to show a hamburger menu (bars) on small screens -->
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -27,22 +27,15 @@
 		</div>
 		<div id='content'>
 			<div id="loading"></div>
-			<p style='font-size: 100%'>Here is a collection of some 'fun stats' that I found! You can find the 'Most Clutch Players' in the league (who has scored the most game-winning goals), the 'Special Teams Specialists' (the players who spend the most time per game on the power play or penalty kill), the 'Best Offensive Players' (the players with the highest points-per-game), the 'Lady Byng Trophy Contenders' (the players with the most points per penalty minutes), and the 'Best Defensive Players' (the players that are considered the best defensively, as told by my secret stat)!</p>
+			<p id='showFantasy' style='font-size: 100%'>Fantasy yeah</p>
 			<!--cool button animations from https://webdeasy.de/en/top-css-buttons-en/-->
 			<div id='buttonDiv'>
-				<button class="glow-on-hover" onclick="clutchPlayer()">Most Clutch Players</button>
-				<button class="glow-on-hover" onclick="specialTeams()">Special Teams Specialists</button>
-				<button class="glow-on-hover" onclick="offensive()">Best Offensive Players</button>
-				<button class="glow-on-hover" onclick="gentle()">Lady Byng Trophy Contenders</button>
-				<button class="glow-on-hover" onclick="defensive()">Best Defensive Players</button>
 				<button class="glow-on-hover" onclick="fantasy()">Best Fantasy Players</button>
 			</div>
-			<p id='showFunStats'></p>
-			<div id='chart'></div>
 		</div>
 		<div id='footer'><p id='copy'>&copy; Jason Gillanders 2021, All Rights Reserved</p></div>
 		<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 		<script src="https://www.gstatic.com/charts/loader.js"></script>
-    <script src="funStats.js"></script>
+    <script src="fantasy.js"></script>
   </body>
 </html>

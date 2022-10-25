@@ -8,8 +8,6 @@ var offensiveArray = [];
 var gentleArray = [];
 //the array to hold stats for the 'defensive stats'
 var defensiveArray = [];
-//the array to hold stats for the 'fantasy league stats'
-var fantasyArray = [];
 //the names of the top 10 players for all of these stats (this array is constantly changing, depending on which data set is being looked at)
 var top10Names = [];
 //a filtered array for clutch stats
@@ -22,8 +20,6 @@ var top10Offensive = [];
 var top10Gentle = [];
 //a filtered array for defensive stats
 var top10Defensive = [];
-//a filtered array for fantasy stats
-var top10Fantasy = [];
 //whether the clutch stats should be shown in a chart or not
 var clutchTable = false;
 //whether the special teams stats should be shown in a chart or not
@@ -34,8 +30,6 @@ var offensiveTable = false;
 var gentleTable = false;
 //whether the defensive stats should be shown in a chart or not
 var defensiveTable = false;
-//whether the fantasy stats should be shown in a chart or not
-var fantasyTable = false;
 
 
 //from https://dev.to/vaishnavme/displaying-loading-animation-on-fetch-api-calls-1e5m
@@ -64,51 +58,43 @@ specialArray = [];
 offensiveArray = [];
 gentleArray = [];
 defensiveArray = [];
-fantasyArray = [];
 top10GWG = [];
 top10Names = [];
 top10Special = [];
 top10Offensive = [];
 top10Gentle = [];
 top10Defensive = [];
-top10Fantasy = [];
 }
 
 //when the first button is clicked
 function clutchPlayer() {
 	reset();
 	//start searching for stats
-	allTeams('clutch');
+	allTeamIds('clutch');
 }
 //when the second button is clicked
 function specialTeams() {
 	reset();
 	//start searching for stats
-	allTeams('specialTeams');
+	allTeamIds('specialTeams');
 }
 //when the third button is clicked
 function offensive() {
 	reset();
 	//start searching for stats
-	allTeams('offensive');
+	allTeamIds('offensive');
 }
 //when the fourth button is clicked
 function gentle() {
 	reset();
 	//start searching for stats
-	allTeams('gentle');
+	allTeamIds('gentle');
 }
 //when the fifth button is clicked
 function defensive() {
 	reset();
 	//start searching for stats
-	allTeams('defensive');
-}
-//when the sixth button is clicked
-function fantasy() {
-	reset();
-	//start searching for stats
-	allTeams('fantasy');
+	allTeamIds('defensive');
 }
 
 //the hub for starting a stat search
@@ -145,10 +131,6 @@ function allTeams(funStat) {
 			else if (funStat=='defensive')
 			{
 				allRostersDefensive(response.data.teams[i].link);
-			}
-			else if (funStat=='fantasy')
-			{
-				allRostersFantasy(response.data.teams[i].link);
 			}
 		}
   });
@@ -210,23 +192,6 @@ function allRostersDefensive(teamLink) {
 			}
 		})
 }
-function allRostersFantasy(teamLink) {
-	axios.get('https://statsapi.web.nhl.com/' + teamLink + "/roster")
-		.then((response) => {
-			//same as above
-			for (var i=0;i<response.data.roster.length;i++)
-			{
-				if (response.data.roster[i].position.code=="C") {
-					var isCenter = true;
-				}
-				else {
-					var isCenter = false;
-				}
-				var names = response.data.roster[i].person.fullName;
-				getFantasy(response.data.roster[i].person.link,names,isCenter);
-			}
-		})
-}
 function getClutchStats(playerLink,playerName) {
 	axios.get('https://statsapi.web.nhl.com/' + playerLink + '/stats?stats=statsSingleSeason&season=20222023')
 		.then((response) => {
@@ -247,7 +212,6 @@ function getClutchStats(playerLink,playerName) {
 				top10GWG = getCol(top10, 1);
 			  //document.getElementById("showFunStats").innerHTML = top10;
 				//we want to show the clutch stats only
-			  	fantasyTable = false;
 				clutchTable = true;
 				specialTable = false;
 				offensiveTable = false;
@@ -280,7 +244,6 @@ function getSpecialTeams(playerLink,playerName) {
 				top10Names = getCol(top10, 0)
 				top10Special = getCol(top10, 1);
 			  //document.getElementById("showFunStats").innerHTML = top10;
-			  	fantasyTable = false;
 				 specialTable = true;
 				 clutchTable = false;
 				 offensiveTable = false;
@@ -310,7 +273,6 @@ function getOffensive(playerLink,playerName) {
 				top10Names = getCol(top10, 0)
 				top10Offensive = getCol(top10, 1);
 			  //document.getElementById("showFunStats").innerHTML = top10;
-			  	fantasyTable = false;
 				offensiveTable = true;
 				clutchTable = false;
 				specialTable = false;
@@ -350,7 +312,6 @@ function getGentle(playerLink,playerName) {
 				top10Names = getCol(top10, 0)
 				top10Gentle = getCol(top10, 1);
 			  //document.getElementById("showFunStats").innerHTML = top10;
-			  	fantasyTable = false;
 				gentleTable = true;
 				clutchTable = false;
 				specialTable = false;
@@ -385,7 +346,6 @@ function getDefensive(playerLink,playerName) {
 				top10Names = getCol(top10, 0)
 				top10Defensive = getCol(top10, 1);
 			  //document.getElementById("showFunStats").innerHTML = top10;
-			  	fantasyTable = false;
 				defensiveTable = true;
 				clutchTable = false;
 				specialTable = false;
@@ -393,55 +353,6 @@ function getDefensive(playerLink,playerName) {
 				gentleTable = false;
 				google.charts.load('current', {'packages':['corechart']});
 				google.charts.setOnLoadCallback(drawChartDefensive);
-		})
-}
-function getFantasy(playerLink,playerName,isCenter) {
-	axios.get('https://statsapi.web.nhl.com/' + playerLink + '/stats?stats=statsSingleSeason&season=20222023')
-		.then((response) => {
-			//the same as above
-			//playerNameArray.push(playerName);
-			//playerPointsArray.push(response.data.stats[0].splits[0].stat.points);
-			if (response.data.stats[0].splits[0].stat.points!=undefined)
-			{
-				var gamesPlayed = response.data.stats[0].splits[0].stat.games;
-				var goals = response.data.stats[0].splits[0].stat.goals;
-				var assists = response.data.stats[0].splits[0].stat.assists;
-				var plusMinus = response.data.stats[0].splits[0].stat.plusMinus;
-				var pim = response.data.stats[0].splits[0].stat.pim;
-				var ppp = response.data.stats[0].splits[0].stat.powerPlayPoints;
-				var shp = response.data.stats[0].splits[0].stat.shortHandedPoints;
-				var shots = response.data.stats[0].splits[0].stat.shots;
-				var faceoffPerc = response.data.stats[0].splits[0].stat.faceOffPct;
-				var shifts = response.data.stats[0].splits[0].stat.shifts;
-				if (isCenter) {
-					var faceoffWon = faceoffPerc*shifts;
-				}
-				else {
-					var faceoffWon = 0;
-				}
-				var hits = response.data.stats[0].splits[0].stat.hits;
-				var blocked = response.data.stats[0].splits[0].stat.blocked;
-				if (gamesPlayed>1)
-				{
-					fantasyArray.push([playerName,(goals*5)+(assists*3)+(plusMinus)+(pim*0.5)+(ppp*2)+(shp*4)+(shots*0.9)+(hits)+(blocked)+(faceoffWon*0.01*0.42)]);
-				}
-				fantasyArray.sort(numberSort);
-			}
-				top10 = fantasyArray.filter(filterTop10);
-				top10Names = getCol(top10, 0);
-				top10Fantasy = getCol(top10, 1);
-				top500 = fantasyArray.filter(filterTop500);
-				top500Names = getCol(top500, 0);
-				top500Fantasy = getCol(top500, 1);
-			  //document.getElementById("showFunStats").innerHTML = top10;
-			  	fantasyTable = true;
-				defensiveTable = false;
-				clutchTable = false;
-				specialTable = false;
-				offensiveTable = false;
-				gentleTable = false;
-				google.charts.load('current', {'packages':['corechart']});
-				google.charts.setOnLoadCallback(drawChartFantasy);
 		})
 }
 //sorts a 2d array by the second value
@@ -677,70 +588,6 @@ function drawChartDefensive() {
   chart.draw(data, options);
 	hideLoading();
 }
-//draws the chart for the fantasy stats
-//refer to above for more info
-function drawChartFantasy() {
-	var data = google.visualization.arrayToDataTable([
-  ['Player Name', "Fantasy Points", { role: 'style' }],
-  [top500Names[0], top500Fantasy[0], 'fill-color: goldenrod;'],
-	[top500Names[1], top500Fantasy[1], 'fill-color: silver;'],
-	[top500Names[2], top500Fantasy[2], 'fill-color: sienna;'],
-	[top500Names[3], top500Fantasy[3], 'fill-color: royalblue;'] ,
-	[top500Names[4], top500Fantasy[4], 'fill-color: royalblue;'],
-	[top500Names[5], top500Fantasy[5], 'fill-color: royalblue;'],
-	[top500Names[6], top500Fantasy[6], 'fill-color: royalblue;'],
-	[top500Names[7], top500Fantasy[7], 'fill-color: royalblue;'],
-	[top500Names[8], top500Fantasy[8], 'fill-color: royalblue;'],
-	[top500Names[9], top500Fantasy[9], 'fill-color: royalblue;'],
-	[top500Names[10], top500Fantasy[10], 'fill-color: royalblue;'] ,
-	[top500Names[11], top500Fantasy[11], 'fill-color: royalblue;'],
-	[top500Names[12], top500Fantasy[12], 'fill-color: royalblue;'],
-	[top500Names[13], top500Fantasy[13], 'fill-color: royalblue;'],
-	[top500Names[14], top500Fantasy[14], 'fill-color: royalblue;'],
-	[top500Names[15], top500Fantasy[15], 'fill-color: royalblue;'],
-	[top500Names[16], top500Fantasy[16], 'fill-color: royalblue;'],
-	[top500Names[17], top500Fantasy[17], 'fill-color: royalblue;'] ,
-	[top500Names[18], top500Fantasy[18], 'fill-color: royalblue;'],
-	[top500Names[19], top500Fantasy[19], 'fill-color: royalblue;'],
-	[top500Names[20], top500Fantasy[20], 'fill-color: royalblue;'],
-	[top500Names[21], top500Fantasy[21], 'fill-color: royalblue;'],
-	[top500Names[22], top500Fantasy[22], 'fill-color: royalblue;'],
-	[top500Names[23], top500Fantasy[23], 'fill-color: royalblue;'],
-	[top500Names[24], top500Fantasy[24], 'fill-color: royalblue;'] ,
-	[top500Names[25], top500Fantasy[25], 'fill-color: royalblue;'],
-	[top500Names[26], top500Fantasy[26], 'fill-color: royalblue;'],
-	[top500Names[27], top500Fantasy[27], 'fill-color: royalblue;'],
-	[top500Names[28], top500Fantasy[28], 'fill-color: royalblue;'],
-	[top500Names[29], top500Fantasy[29], 'fill-color: royalblue;'],
-	[top500Names[30], top500Fantasy[30], 'fill-color: royalblue;']
-	]);
-	var options = {'title':'Best Fantasy Players',
-	'hAxis': {
-    'textStyle':{'color': 'white'}
-	},
-	'vAxis': {
-    'textStyle':{'color': 'white'}
-	},
-	'legend': {
-		'textStyle':{'color': 'white'}
-	},
-	'titleTextStyle': {
-		'color': 'white'
-	},
-	//'width':'10%',
-	//'height':'50%',
-	'backgroundColor': {
-		'fill': 'black',
-		'fillOpacity': 1,
-		'stroke': 'white',
-		'strokeWidth': 10
-		}
-	};
-	var chart = new google.visualization.BarChart(document.getElementById('chart'));
-  chart.draw(data, options);
-	hideLoading();
-}
-
 //from https://stackoverflow.com/questions/7848004/get-column-from-a-two-dimensional-array
 //gets a single 'column' of a 2d array and puts it into a single array
 function getCol(matrix, col){
@@ -787,10 +634,6 @@ function responsiveNav() {
 		else if (clutchTable==false && defensiveTable==true)
 		{
 			drawChartDefensive(chart);
-		}
-		else if (defensiveTable==false && fantasyTable==true)
-		{
-			drawChartFantasy(chart);
 		}
 		else
 		{
