@@ -1,5 +1,5 @@
-var allPlayers = []
-var allTeams = []
+var allPlayers = [];
+var allTeams = [];
 
 class Team {
 	constructor(name, id, schedule) {
@@ -30,8 +30,33 @@ class Player {
 		this.faceoffWon = this.faceoffPct*this.shifts;
 	}
 
+	setStats(goals, assists, gamesPlayed, pim, shots, blocks, hits, faceoffPct, shifts, ppp, shp, plusMinus) {
+		this.goals = goals;
+		this.assists = assists;
+		this.points = this.goals + this.assists;
+		this.gamesPlayed = gamesPlayed;
+		this.pim = pim;
+		this.shots = shots;
+		this.blocks = blocks;
+		this.hits = hits;
+		this.faceoffPct = faceoffPct;
+		this.shifts = shifts;
+		this.ppp = ppp;
+		this.shp = shp;
+		this.plusMinus = plusMinus;
+		this.faceoffWon = this.faceoffWon;
+	}
+
 	getID() {
 		return this.id;
+	}
+
+	getPosition() {
+		return this.position;
+	}
+
+	getName() {
+		return this.name;
 	}
 }
 
@@ -98,28 +123,34 @@ function getAllPlayerLinks() {
 function getPlayerStats() {
     displayLoading();
 	for(i=0;i<allPlayers.length;i++) {
-		axios.get('https://statsapi.web.nhl.com/' + 'people/' + toString(allPlayers[i].getId()) + '/stats?stats=statsSingleSeason&season=20222023')
-		.then((response) => {
-			console.log("GOT HEREEEEE");
-			allPlayers[i].gamesPlayed = response.data.stats[0].splits[0].stat.games;
-			allPlayers[i].goals = response.data.stats[0].splits[0].stat.goals;
-			allPlayers[i].assists = response.data.stats[0].splits[0].stat.assists;
-			allPlayers[i].plusMinus = response.data.stats[0].splits[0].stat.plusMinus;
-			allPlayers[i].pim = response.data.stats[0].splits[0].stat.pim;
-			allPlayers[i].ppp = response.data.stats[0].splits[0].stat.powerPlayPoints;
-			allPlayers[i].shp = response.data.stats[0].splits[0].stat.shortHandedPoints;
-			allPlayers[i].shots = response.data.stats[0].splits[0].stat.shots;
-			allPlayers[i].faceoffPct = response.data.stats[0].splits[0].stat.faceOffPct;
-			allPlayers[i].shifts = response.data.stats[0].splits[0].stat.shifts;
-			if (allPlayers[i].position == 'C') {
-				allPlayers[i].faceoffWon = faceoffPct*shifts;
-			}
-			else {
-				allPlayers[i].faceoffWon = 0;
-			}
-			allPlayers[i].hits = response.data.stats[0].splits[0].stat.hits;
-			allPlayers[i].blocks = response.data.stats[0].splits[0].stat.blocked;
-        })
+		if(allPlayers[i].getID() != undefined) {
+			axios.get('https://statsapi.web.nhl.com/' + 'api/v1/people/' + allPlayers[i].getID() + '/stats?stats=statsSingleSeason&season=20222023')
+			.then((response) => {
+				console.log("GOT HEREEEEE");
+				if(response.data.stats[0].splits[0].stat.goals != undefined) {
+					var gamesPlayed = response.data.stats[0].splits[0].stat.games;
+					var goals = response.data.stats[0].splits[0].stat.goals;
+					var assists = response.data.stats[0].splits[0].stat.assists;
+					var plusMinus = response.data.stats[0].splits[0].stat.plusMinus;
+					var pim = response.data.stats[0].splits[0].stat.pim;
+					var ppp = response.data.stats[0].splits[0].stat.powerPlayPoints;
+					var shp = response.data.stats[0].splits[0].stat.shortHandedPoints;
+					var shots = response.data.stats[0].splits[0].stat.shots;
+					var faceoffPct = response.data.stats[0].splits[0].stat.faceOffPct;
+					var shifts = response.data.stats[0].splits[0].stat.shifts;
+					if (allPlayers[i].getPosition() == 'C') {
+						var faceoffWon = faceoffPct*shifts;
+					}
+					else {
+						var faceoffWon = 0;
+					}
+					var hits = response.data.stats[0].splits[0].stat.hits;
+					var blocks = response.data.stats[0].splits[0].stat.blocked;
+
+					allPlayers[i].setStats(goals, assists, gamesPlayed, pim, shots, blocks, hits, faceoffPct, shifts, ppp, shp, plusMinus, faceoffWon);
+				}
+			})
+        }
 	}
 	console.log(allPlayers)
     hideLoading();
