@@ -1,6 +1,6 @@
 var allPlayers = [];
 var allTeams = [];
-var deadPlayers = [];
+var numPlayers = 0;
 
 class Team {
 	constructor(name, id, schedule) {
@@ -11,28 +11,47 @@ class Team {
 }
 
 class Player {
-	constructor(name, id, position, goals, assists, gamesPlayed, pim, shots, blocks, hits, faceoffPct, shifts, ppp, shp, plusMinus) {
+	constructor(name, id, position) {
 		this.name = name;
 		this.id = id;
 		this.position = position;
-		this.goals = goals;
-		this.assists = assists;
-		this.gamesPlayed = gamesPlayed;
-		this.pim = pim;
-		this.shots = shots;
-		this.blocks = blocks;
-		this.hits = hits;
-		this.faceoffPct = faceoffPct;
-		this.shifts = shifts;
-		this.ppp = ppp;
-		this.shp = shp;
-		this.plusMinus = plusMinus;
+		this.fantasyPoints = 0;
+		if (this.position=='G') {
+			this.ga = 0;
+			this.saves = 0;
+			this.wins = 0;
+			this.shutouts = 0;
+			this.gamesPlayed = 0;
+		}
+		else {
+			this.goals = 0;
+			this.assists = 0;
+			this.points = this.goals + this.assists;
+			this.gamesPlayed = 0;
+			this.pim = 0;
+			this.shots = 0;
+			this.blocks = 0;
+			this.hits = 0;
+			this.faceoffPct = 0;
+			this.shifts = 0;
+			this.ppp = 0;
+			this.shp = 0;
+			this.plusMinus = 0;
+		}
 	}
 
-	setStats(goals, assists, gamesPlayed, pim, shots, blocks, hits, faceoffPct, shifts, ppp, shp, plusMinus) {
+	setStats(ga, saves, gamesPlayed, wins, shutouts) {
+		this.ga = ga;
+		this.saves = saves;
+		this.wins = wins;
+		this.shutouts = shutouts;
+		this.gamesPlayed = gamesPlayed;
+	}
+
+	setStats(goals, assists, gamesPlayed, pim, shots, blocks, hits, faceoffPct, shifts, ppp, shp, plusMinus, faceoffWon) {
 		this.goals = goals;
 		this.assists = assists;
-		this.points = this.goals + this.assists;
+		this.points = goals + assists;
 		this.gamesPlayed = gamesPlayed;
 		this.pim = pim;
 		this.shots = shots;
@@ -43,7 +62,24 @@ class Player {
 		this.ppp = ppp;
 		this.shp = shp;
 		this.plusMinus = plusMinus;
-		this.faceoffWon = this.faceoffWon;
+		this.faceoffWon = faceoffWon;
+	}
+
+	setFantasyPoints(fantasyPoints) {
+		this.fantasyPoints = fantasyPoints;
+	}
+
+	getFantasyPoints() {
+		return this.fantasyPoints;
+	}
+
+	getStats(playerPosition) {
+		if (playerPosition == 'G') {
+			return [this.ga, this.saves, this.gamesPlayed, this.wins, this.shutouts];
+		}
+		else {
+			return [this.goals, this.assists, this.points, this.gamesPlayed, this.pim, this.shots, this.blocks, this.hits, this.faceoffPct, this.shifts, this.ppp, this.shp, this.plusMinus, this.faceoffWon];
+		}
 	}
 
 	getID() {
@@ -95,8 +131,9 @@ function hideLoading() {
 
 //resets all of the arrays
 function reset() {
-allPlayers = []
-allTeams = []
+allPlayers = [];
+allTeams = [];
+numPlayers = 0;
 }
 
 
@@ -112,9 +149,11 @@ function getAllTeamIds() {
 		.then((response) => {
             for(i=0;i<response.data.teams.length;i++) {
 				allTeams[i] = new Team(response.data.teams[i].name,response.data.teams[i].id);
+				if(i==response.data.teams.length-1) {
+					getAllPlayerLinks();
+				}
             }
             console.log(allTeams);
-			getAllPlayerLinks();
         })
     hideLoading();
 }
@@ -125,27 +164,43 @@ function getAllPlayerLinks() {
 		.then((response) => {
             for(i=0;i<allTeams.length;i++) {
                 for(j=0;j<response.data.teams[i].roster.roster.length;j++) {
-                    allPlayers[(j*i)+j] = new Player(response.data.teams[i].roster.roster[j].person.fullName,response.data.teams[i].roster.roster[j].person.id,response.data.teams[i].roster.roster[j].position.code);
+                    allPlayers[numPlayers+j] = new Player(response.data.teams[i].roster.roster[j].person.fullName,response.data.teams[i].roster.roster[j].person.id,response.data.teams[i].roster.roster[j].position.code);
                 }
+				numPlayers+=response.data.teams[i].roster.roster.length;
             }
             console.log(allPlayers)
-			//getPlayerStats();
+			getPlayerStats();
         })
     hideLoading();
 }
 
 function getPlayerStats() {
     displayLoading();
-	purgeUndefinedPlayers();
+	//purgeUndefinedPlayers();
 	for(i=0;i<allPlayers.length;i++) {
-		console.log("I: " + i);
-		console.log("PLAYER " + i + " OBJECT = " + allPlayers[i]);
-		console.log("PLAYER " + i + " NAME = " + allPlayers[i].getName());
-		if(i<312) {
-			axios.get('https://statsapi.web.nhl.com/' + 'api/v1/people/' + allPlayers[i].getID() + '/stats?stats=statsSingleSeason&season=20222023')
+		getIndividualPlayerStats(i);
+		if(i==allPlayers.length-1) {
+			printTop10Fantasy();
+		}
+	}
+	console.log(allPlayers)
+    hideLoading();
+}
+
+function getIndividualPlayerStats(i) {
+	axios.get('https://statsapi.web.nhl.com/' + 'api/v1/people/' + allPlayers[i].getID() + '/stats?stats=statsSingleSeason&season=20222023')
 			.then((response) => {
 				console.log("GOT HEREEEEE");
-				/* if(response.data.stats[0].splits[0].stat.goals != undefined) {
+				console.log("PLAYER " + i + " NAME = " + allPlayers[i].name);
+				if (allPlayers[i].getPosition == "G") {
+					var gamesPlayed = response.data.stats[0].splits[0].stat.games;
+					var ga = response.data.stats[0].splits[0].stat.goalsAgainst;
+					var saves = response.data.stats[0].splits[0].stat.saves;
+					var wins = response.data.stats[0].splits[0].stat.wins;
+					var shutouts = response.data.stats[0].splits[0].stat.shutouts;
+					allPlayers[i].setStats(ga, saves, gamesPlayed, wins, shutouts);
+				}
+				else {
 					var gamesPlayed = response.data.stats[0].splits[0].stat.games;
 					var goals = response.data.stats[0].splits[0].stat.goals;
 					var assists = response.data.stats[0].splits[0].stat.assists;
@@ -157,7 +212,7 @@ function getPlayerStats() {
 					var faceoffPct = response.data.stats[0].splits[0].stat.faceOffPct;
 					var shifts = response.data.stats[0].splits[0].stat.shifts;
 					if (allPlayers[i].getPosition() == 'C') {
-						var faceoffWon = faceoffPct*shifts;
+						var faceoffWon = faceoffPct*shifts*0.01;
 					}
 					else {
 						var faceoffWon = 0;
@@ -167,23 +222,32 @@ function getPlayerStats() {
 
 					allPlayers[i].setStats(goals, assists, gamesPlayed, pim, shots, blocks, hits, faceoffPct, shifts, ppp, shp, plusMinus, faceoffWon);
 				}
-				*/
 			})
-		}
-	}
-	console.log(allPlayers)
-    hideLoading();
 }
 
-function purgeUndefinedPlayers() {
-	console.log("PURRRRRRRRRRRGING");
-	for(i=allPlayers.length-1;i>=0;i--) {
-		if(allPlayers[i]==undefined) {
-			deadPlayers[i] = (allPlayers[i]);
-			allPlayers.splice(i,1);
+function printTop10Fantasy() {
+	var top10Array = [{"Name": "", "FantasyPoints:": 0}, {"Name": "", "FantasyPoints:": 0}, {"Name": "", "FantasyPoints:": 0}, {"Name": "", "FantasyPoints:": 0}, {"Name": "", "FantasyPoints:": 0}, {"Name": "", "FantasyPoints:": 0}, {"Name": "", "FantasyPoints:": 0}, {"Name": "", "FantasyPoints:": 0}, {"Name": "", "FantasyPoints:": 0}, {"Name": "", "FantasyPoints:": 0}]
+	console.log(top10Array);
+	for(i=0; i<allPlayers.length;i++) {
+		if(allPlayers[i].getPosition() == 'G') {
+			var statsArray = allPlayers[i].getStats('G');
 		}
-		console.log("PERSON " + i + " OBJECT TYPE: " + allPlayers[i]);
+		else {
+			var statsArray = allPlayers[i].getStats('NG');
+			var fantasyPoints = (statsArray[0]*5)+(statsArray[1]*3)+(statsArray[12])+(statsArray[4]*0.5)+(statsArray[10]*2)+(statsArray[11]*4)+(statsArray[5]*0.9)+(statsArray[7])+(statsArray[6])+(statsArray[13]*0.01*0.42);
+			allPlayers[i].setFantasyPoints(fantasyPoints);
+		}
 	}
+	for(j=0; j<allPlayers.length; j++) {
+		for(k=0; k<10; k++) {
+			if (top10Array[k].FantasyPoints < allPlayers[j].getFantasyPoints()) {
+				top10Array[k].FantasyPoints = allPlayers[j].getFantasyPoints();
+				top10Array[k].Name = allPlayers[j].getName();
+			}
+		}
+	}
+	console.log(top10Array);
+	//document.getElementById('showFantasy').innerHTML = toString(top10Array.FantasyPoints) + top10Array.Name;
 }
 
 /*
