@@ -1,5 +1,6 @@
 var allPlayers = [];
 var allTeams = [];
+var deadPlayers = [];
 
 class Team {
 	constructor(name, id, schedule) {
@@ -16,7 +17,6 @@ class Player {
 		this.position = position;
 		this.goals = goals;
 		this.assists = assists;
-		this.points = this.goals + this.assists;
 		this.gamesPlayed = gamesPlayed;
 		this.pim = pim;
 		this.shots = shots;
@@ -27,7 +27,6 @@ class Player {
 		this.ppp = ppp;
 		this.shp = shp;
 		this.plusMinus = plusMinus;
-		this.faceoffWon = this.faceoffPct*this.shifts;
 	}
 
 	setStats(goals, assists, gamesPlayed, pim, shots, blocks, hits, faceoffPct, shifts, ppp, shp, plusMinus) {
@@ -48,15 +47,30 @@ class Player {
 	}
 
 	getID() {
-		return this.id;
+		if(this.id!=undefined){
+			return(this.id);
+		}
+		else {
+			return("NO ID");
+		}
 	}
 
 	getPosition() {
-		return this.position;
+		if(this.position!=undefined){
+			return(this.position);
+		}
+		else {
+			return("NO position");
+		}
 	}
 
 	getName() {
-		return this.name;
+		if(this.name!=undefined){
+			return(this.name);
+		}
+		else {
+			return("NO name");
+		}
 	}
 }
 
@@ -90,8 +104,6 @@ allTeams = []
 function fantasy() {
 	reset();
     getAllTeamIds();
-    getAllPlayerLinks();
-	getPlayerStats();
 }
 
 function getAllTeamIds() {
@@ -102,6 +114,7 @@ function getAllTeamIds() {
 				allTeams[i] = new Team(response.data.teams[i].name,response.data.teams[i].id);
             }
             console.log(allTeams);
+			getAllPlayerLinks();
         })
     hideLoading();
 }
@@ -116,18 +129,23 @@ function getAllPlayerLinks() {
                 }
             }
             console.log(allPlayers)
+			//getPlayerStats();
         })
     hideLoading();
 }
 
 function getPlayerStats() {
     displayLoading();
+	purgeUndefinedPlayers();
 	for(i=0;i<allPlayers.length;i++) {
-		if(allPlayers[i].getID() != undefined) {
+		console.log("I: " + i);
+		console.log("PLAYER " + i + " OBJECT = " + allPlayers[i]);
+		console.log("PLAYER " + i + " NAME = " + allPlayers[i].getName());
+		if(i<312) {
 			axios.get('https://statsapi.web.nhl.com/' + 'api/v1/people/' + allPlayers[i].getID() + '/stats?stats=statsSingleSeason&season=20222023')
 			.then((response) => {
 				console.log("GOT HEREEEEE");
-				if(response.data.stats[0].splits[0].stat.goals != undefined) {
+				/* if(response.data.stats[0].splits[0].stat.goals != undefined) {
 					var gamesPlayed = response.data.stats[0].splits[0].stat.games;
 					var goals = response.data.stats[0].splits[0].stat.goals;
 					var assists = response.data.stats[0].splits[0].stat.assists;
@@ -149,11 +167,23 @@ function getPlayerStats() {
 
 					allPlayers[i].setStats(goals, assists, gamesPlayed, pim, shots, blocks, hits, faceoffPct, shifts, ppp, shp, plusMinus, faceoffWon);
 				}
+				*/
 			})
-        }
+		}
 	}
 	console.log(allPlayers)
     hideLoading();
+}
+
+function purgeUndefinedPlayers() {
+	console.log("PURRRRRRRRRRRGING");
+	for(i=allPlayers.length-1;i>=0;i--) {
+		if(allPlayers[i]==undefined) {
+			deadPlayers[i] = (allPlayers[i]);
+			allPlayers.splice(i,1);
+		}
+		console.log("PERSON " + i + " OBJECT TYPE: " + allPlayers[i]);
+	}
 }
 
 /*
