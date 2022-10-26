@@ -1,5 +1,19 @@
-var allTeamInfo = {};
-var allPlayerInfo = {};
+allPlayers = []
+allTeams = []
+
+class Team {
+	constructor(name, id) {
+		this.name = name;
+		this.id = id;
+	}
+}
+
+class Player {
+	constructor(name, id) {
+		this.name = name;
+		this.id = id;
+	}
+}
 
 //from https://dev.to/vaishnavme/displaying-loading-animation-on-fetch-api-calls-1e5m
 // selecting loading div
@@ -22,11 +36,8 @@ function hideLoading() {
 
 //resets all of the arrays
 function reset() {
-allTeamInfo = {
-    "ids": [],
-    "weeklySchedule": []
-};
-allPlayerInfo = {};
+allPlayers = []
+allTeams = []
 }
 
 
@@ -42,58 +53,27 @@ function getAllTeamIds() {
     axios.get('https://statsapi.web.nhl.com/' + 'api/v1/teams')
 		.then((response) => {
             for(i=0;i<response.data.teams.length;i++) {
-                allTeamInfo['ids'].push(response.data.teams[i].id);
+				allTeams[i] = new Team(response.data.teams[i].name,response.data.teams[i].id);
             }
-            console.log(allTeamIds);
+            console.log(allTeams);
         })
     hideLoading();
 }
 
 function getAllPlayerLinks() {
     displayLoading();
-    allTeamsString = "";
-    for(i=0;i<allTeamIds.length;i++) {
-        if (i!=(allTeamIds.length-1)) {
-            allTeamsString = allTeamsString + toString(allTeamIds[i]) + ',';
-        }
-        else {
-            allTeamsString = allTeamsString + toString(allTeamIds[i]);
-        }
-    }
-    axios.get('https://statsapi.web.nhl.com/' + 'api/v1/teams/' + '?teamId=' + allTeamsString + "&expand=team.roster")
+    axios.get('https://statsapi.web.nhl.com/' + 'api/v1/teams/' + '?teamId=' + "&expand=team.roster")
 		.then((response) => {
-            for(i=0;i<allTeamIds.length;i++) {
+            for(i=0;i<allTeams.length;i++) {
                 for(j=0;j<response.data.teams[i].roster.roster.length;j++) {
-                    allPlayerLinks.push(response.data.teams[i].roster.roster[j].person.id);
+                    allPlayers[(j*i)+j] = new Player(response.data.teams[i].roster.roster[j].person.fullName,response.data.teams[i].roster.roster[j].person.id);
                 }
             }
-            console.log(allPlayerLinks)
+            console.log(allPlayers)
         })
     hideLoading();
 }
 
-function getAllPlayerLinks() {
-    displayLoading();
-    allTeamsString = "";
-    for(i=0;i<allTeamIds.length;i++) {
-        if (i!=(allTeamIds.length-1)) {
-            allTeamsString = allTeamsString + toString(allTeamIds[i]) + ',';
-        }
-        else {
-            allTeamsString = allTeamsString + toString(allTeamIds[i]);
-        }
-    }
-    axios.get('https://statsapi.web.nhl.com/' + playerLink + '/stats?stats=statsSingleSeason&season=20222023')
-		.then((response) => {
-            for(i=0;i<allTeamIds.length;i++) {
-                for(j=0;j<response.data.teams[i].roster.roster.length;j++) {
-                    allPlayerLinks.push(response.data.teams[i].roster.roster[j].person.id);
-                }
-            }
-            console.log(allPlayerLinks)
-        })
-    hideLoading();
-}
 /*
 if (funStat=='fantasy')
 {
