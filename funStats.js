@@ -70,31 +70,31 @@ top10Defensive = [];
 function clutchPlayer() {
 	reset();
 	//start searching for stats
-	allTeamIds('clutch');
+	allTeams('clutch');
 }
 //when the second button is clicked
 function specialTeams() {
 	reset();
 	//start searching for stats
-	allTeamIds('specialTeams');
+	allTeams('specialTeams');
 }
 //when the third button is clicked
 function offensive() {
 	reset();
 	//start searching for stats
-	allTeamIds('offensive');
+	allTeams('offensive');
 }
 //when the fourth button is clicked
 function gentle() {
 	reset();
 	//start searching for stats
-	allTeamIds('gentle');
+	allTeams('gentle');
 }
 //when the fifth button is clicked
 function defensive() {
 	reset();
 	//start searching for stats
-	allTeamIds('defensive');
+	allTeams('defensive');
 }
 
 //the hub for starting a stat search

@@ -3,19 +3,32 @@ var allTeams = [];
 var numPlayers = 0;
 
 class Team {
-	constructor(name, id, schedule) {
+	constructor(name, id) {
 		this.name = name;
 		this.id = id;
-		this.schedule = schedule;
+		this.games = 0;
+	}
+
+	setGamesInWeek(games) {
+		this.games = games;
+	}
+
+	getGamesInWeek() {
+		return this.games;
+	}
+
+	getID() {
+		return this.id;
 	}
 }
 
 class Player {
-	constructor(name, id, position) {
+	constructor(name, id, position, team) {
 		this.name = name;
 		this.id = id;
 		this.position = position;
 		this.fantasyPoints = 0;
+		this.team = team;
 		if (position == "G") {
 			this.ga = 0;
 			this.saves = 0;
@@ -40,7 +53,7 @@ class Player {
 		}
 	}
 
-	setStats(ga, saves, gamesPlayed, wins, shutouts) {
+	setGStats(ga, saves, gamesPlayed, wins, shutouts) {
 		this.ga = ga;
 		this.saves = saves;
 		this.wins = wins;
@@ -80,6 +93,10 @@ class Player {
 		else {
 			return [this.goals, this.assists, this.points, this.gamesPlayed, this.pim, this.shots, this.blocks, this.hits, this.faceoffPct, this.shifts, this.ppp, this.shp, this.plusMinus, this.faceoffWon];
 		}
+	}
+
+	getGamesPlayed() {
+		return this.gamesPlayed;
 	}
 
 	getID() {
@@ -150,12 +167,31 @@ function getAllTeamIds() {
             for(i=0;i<response.data.teams.length;i++) {
 				allTeams[i] = new Team(response.data.teams[i].name,response.data.teams[i].id);
 				if(i==response.data.teams.length-1) {
-					getAllPlayerLinks();
+					for(k=0;k<allTeams.length;k++) {
+						getWeeklySchedule(k);
+					}
 				}
-            }
+			}
             console.log(allTeams);
         })
     hideLoading();
+}
+
+function getWeeklySchedule(k) {
+	displayLoading();
+	currentDate = new Date();
+	console.log(currentDate.getMonth()+1);
+	console.log(currentDate.getDate());
+	console.log(currentDate.getDay());
+	console.log(currentDate.getFullYear());
+
+	axios.get('https://statsapi.web.nhl.com/api/v1/schedule' + '?teamId=' + allTeams[k].getID() + '&startDate=' + currentDate.getFullYear() + '-' + (currentDate.getMonth()+1).toString() + '-' + currentDate.getDate())
+		.then((response) => {
+			if(k==allTeams.length-1) {
+				getAllPlayerLinks();
+			}
+		})
+	hideLoading();
 }
 
 function getAllPlayerLinks() {
@@ -164,7 +200,7 @@ function getAllPlayerLinks() {
 		.then((response) => {
             for(i=0;i<allTeams.length;i++) {
                 for(j=0;j<response.data.teams[i].roster.roster.length;j++) {
-                    allPlayers[numPlayers+j] = new Player(response.data.teams[i].roster.roster[j].person.fullName,response.data.teams[i].roster.roster[j].person.id,response.data.teams[i].roster.roster[j].position.code);
+                    allPlayers[numPlayers+j] = new Player(response.data.teams[i].roster.roster[j].person.fullName,response.data.teams[i].roster.roster[j].person.id,response.data.teams[i].roster.roster[j].position.code,allTeams[i]);
                 }
 				numPlayers+=response.data.teams[i].roster.roster.length;
             }
@@ -186,36 +222,40 @@ function getPlayerStats() {
 function getIndividualPlayerStats(i) {
 	axios.get('https://statsapi.web.nhl.com/' + 'api/v1/people/' + allPlayers[i].getID() + '/stats?stats=statsSingleSeason&season=20222023')
 			.then((response) => {
-				console.log("PLAYER " + i + " NAME = " + allPlayers[i].name);
-				if (allPlayers[i].getPosition() == "G") {
-					var gamesPlayed = response.data.stats[0].splits[0].stat.games;
-					var ga = response.data.stats[0].splits[0].stat.goalsAgainst;
-					var saves = response.data.stats[0].splits[0].stat.saves;
-					var wins = response.data.stats[0].splits[0].stat.wins;
-					var shutouts = response.data.stats[0].splits[0].stat.shutouts;
-					allPlayers[i].setStats(ga, saves, gamesPlayed, wins, shutouts);
-				}
-				else {
-					var gamesPlayed = response.data.stats[0].splits[0].stat.games;
-					var goals = response.data.stats[0].splits[0].stat.goals;
-					var assists = response.data.stats[0].splits[0].stat.assists;
-					var plusMinus = response.data.stats[0].splits[0].stat.plusMinus;
-					var pim = response.data.stats[0].splits[0].stat.pim;
-					var ppp = response.data.stats[0].splits[0].stat.powerPlayPoints;
-					var shp = response.data.stats[0].splits[0].stat.shortHandedPoints;
-					var shots = response.data.stats[0].splits[0].stat.shots;
-					var faceoffPct = response.data.stats[0].splits[0].stat.faceOffPct;
-					var shifts = response.data.stats[0].splits[0].stat.shifts;
-					if (allPlayers[i].getPosition() == 'C') {
-						var faceoffWon = faceoffPct*shifts;
+				if (response.data.stats[0].splits[0] != undefined){
+					if (allPlayers[i].getPosition() == "G") {
+						var gamesPlayed = response.data.stats[0].splits[0].stat.games;
+						var ga = response.data.stats[0].splits[0].stat.goalsAgainst;
+						var saves = response.data.stats[0].splits[0].stat.saves;
+						var wins = response.data.stats[0].splits[0].stat.wins;
+						var shutouts = response.data.stats[0].splits[0].stat.shutouts;
+						allPlayers[i].setGStats(ga, saves, gamesPlayed, wins, shutouts);
 					}
 					else {
-						var faceoffWon = 0;
-					}
-					var hits = response.data.stats[0].splits[0].stat.hits;
-					var blocks = response.data.stats[0].splits[0].stat.blocked;
+						var gamesPlayed = response.data.stats[0].splits[0].stat.games;
+						var goals = response.data.stats[0].splits[0].stat.goals;
+						var assists = response.data.stats[0].splits[0].stat.assists;
+						var plusMinus = response.data.stats[0].splits[0].stat.plusMinus;
+						var pim = response.data.stats[0].splits[0].stat.pim;
+						var ppp = response.data.stats[0].splits[0].stat.powerPlayPoints;
+						var shp = response.data.stats[0].splits[0].stat.shortHandedPoints;
+						var shots = response.data.stats[0].splits[0].stat.shots;
+						var faceoffPct = response.data.stats[0].splits[0].stat.faceOffPct;
+						var shifts = response.data.stats[0].splits[0].stat.shifts;
+						if (allPlayers[i].getPosition() == 'C') {
+							var faceoffWon = faceoffPct*shifts;
+						}
+						else {
+							var faceoffWon = 0;
+						}
+						var hits = response.data.stats[0].splits[0].stat.hits;
+						var blocks = response.data.stats[0].splits[0].stat.blocked;
 
-					allPlayers[i].setStats(goals, assists, gamesPlayed, pim, shots, blocks, hits, faceoffPct, shifts, ppp, shp, plusMinus, faceoffWon);
+						allPlayers[i].setStats(goals, assists, gamesPlayed, pim, shots, blocks, hits, faceoffPct, shifts, ppp, shp, plusMinus, faceoffWon);
+					}
+				}
+				else {
+					console.log("PLAYER " + i + " NAME = " + allPlayers[i].name);
 				}
 				
 				if(i==allPlayers.length-1) {
@@ -227,15 +267,20 @@ function getIndividualPlayerStats(i) {
 
 function printTop10Fantasy() {
 	for(i=0; i<allPlayers.length;i++) {
-		if(allPlayers[i].getPosition() == "G") {
-			var statsArray = allPlayers[i].getStats('G');
-			var fantasyPoints = (statsArray[0]*-3)+(statsArray[1]*0.6)+(statsArray[3]*5)+(statsArray[4]*5);
-			allPlayers[i].setFantasyPoints(fantasyPoints);
+		if (allPlayers[i].getGamesPlayed() != 0) {
+			if(allPlayers[i].getPosition() == "G") {
+				var statsArray = allPlayers[i].getStats('G');
+				var fantasyPoints = (statsArray[0]*-3)+(statsArray[1]*0.6)+(statsArray[3]*5)+(statsArray[4]*5);
+				allPlayers[i].setFantasyPoints(fantasyPoints);
+			}
+			else {
+				var statsArray = allPlayers[i].getStats('NG');
+				var fantasyPoints = (statsArray[0]*5)+(statsArray[1]*3)+(statsArray[12])+(statsArray[4]*0.5)+(statsArray[10]*2)+(statsArray[11]*4)+(statsArray[5]*0.9)+(statsArray[7])+(statsArray[6])+(statsArray[13]*0.01*0.45);
+				allPlayers[i].setFantasyPoints(fantasyPoints);
+			}
 		}
 		else {
-			var statsArray = allPlayers[i].getStats('NG');
-			var fantasyPoints = (statsArray[0]*5)+(statsArray[1]*3)+(statsArray[12])+(statsArray[4]*0.5)+(statsArray[10]*2)+(statsArray[11]*4)+(statsArray[5]*0.9)+(statsArray[7])+(statsArray[6])+(statsArray[13]*0.01*0.45);
-			allPlayers[i].setFantasyPoints(fantasyPoints);
+			allPlayers[i].setFantasyPoints(0);
 		}
 	}
 	var top10Array = [{"Name": "", "FantasyPoints": 0}, {"Name": "", "FantasyPoints": 0}, {"Name": "", "FantasyPoints": 0}, {"Name": "", "FantasyPoints": 0}, {"Name": "", "FantasyPoints": 0}, {"Name": "", "FantasyPoints": 0}, {"Name": "", "FantasyPoints": 0}, {"Name": "", "FantasyPoints": 0}, {"Name": "", "FantasyPoints": 0}, {"Name": "", "FantasyPoints": 0}]
