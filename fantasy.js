@@ -179,9 +179,6 @@ function getPlayerStats() {
 	//purgeUndefinedPlayers();
 	for(i=0;i<allPlayers.length;i++) {
 		getIndividualPlayerStats(i);
-		if(i==allPlayers.length-1) {
-			printTop10Fantasy();
-		}
 	}
 	console.log(allPlayers)
     hideLoading();
@@ -190,7 +187,6 @@ function getPlayerStats() {
 function getIndividualPlayerStats(i) {
 	axios.get('https://statsapi.web.nhl.com/' + 'api/v1/people/' + allPlayers[i].getID() + '/stats?stats=statsSingleSeason&season=20222023')
 			.then((response) => {
-				console.log("GOT HEREEEEE");
 				console.log("PLAYER " + i + " NAME = " + allPlayers[i].name);
 				if (allPlayers[i].getPosition == "G") {
 					var gamesPlayed = response.data.stats[0].splits[0].stat.games;
@@ -212,7 +208,7 @@ function getIndividualPlayerStats(i) {
 					var faceoffPct = response.data.stats[0].splits[0].stat.faceOffPct;
 					var shifts = response.data.stats[0].splits[0].stat.shifts;
 					if (allPlayers[i].getPosition() == 'C') {
-						var faceoffWon = faceoffPct*shifts*0.01;
+						var faceoffWon = faceoffPct*shifts;
 					}
 					else {
 						var faceoffWon = 0;
@@ -222,27 +218,37 @@ function getIndividualPlayerStats(i) {
 
 					allPlayers[i].setStats(goals, assists, gamesPlayed, pim, shots, blocks, hits, faceoffPct, shifts, ppp, shp, plusMinus, faceoffWon);
 				}
+				
+				if(i==allPlayers.length-1) {
+					printTop10Fantasy();
+				}
 			})
+		
 }
 
 function printTop10Fantasy() {
-	var top10Array = [{"Name": "", "FantasyPoints:": 0}, {"Name": "", "FantasyPoints:": 0}, {"Name": "", "FantasyPoints:": 0}, {"Name": "", "FantasyPoints:": 0}, {"Name": "", "FantasyPoints:": 0}, {"Name": "", "FantasyPoints:": 0}, {"Name": "", "FantasyPoints:": 0}, {"Name": "", "FantasyPoints:": 0}, {"Name": "", "FantasyPoints:": 0}, {"Name": "", "FantasyPoints:": 0}]
-	console.log(top10Array);
 	for(i=0; i<allPlayers.length;i++) {
 		if(allPlayers[i].getPosition() == 'G') {
 			var statsArray = allPlayers[i].getStats('G');
 		}
 		else {
 			var statsArray = allPlayers[i].getStats('NG');
-			var fantasyPoints = (statsArray[0]*5)+(statsArray[1]*3)+(statsArray[12])+(statsArray[4]*0.5)+(statsArray[10]*2)+(statsArray[11]*4)+(statsArray[5]*0.9)+(statsArray[7])+(statsArray[6])+(statsArray[13]*0.01*0.42);
+			var fantasyPoints = (statsArray[0]*5)+(statsArray[1]*3)+(statsArray[12])+(statsArray[4]*0.5)+(statsArray[10]*2)+(statsArray[11]*4)+(statsArray[5]*0.9)+(statsArray[7])+(statsArray[6])+(statsArray[13]*0.01*0.45);
 			allPlayers[i].setFantasyPoints(fantasyPoints);
 		}
 	}
+	var top10Array = [{"Name": "", "FantasyPoints": 0}, {"Name": "", "FantasyPoints": 0}, {"Name": "", "FantasyPoints": 0}, {"Name": "", "FantasyPoints": 0}, {"Name": "", "FantasyPoints": 0}, {"Name": "", "FantasyPoints": 0}, {"Name": "", "FantasyPoints": 0}, {"Name": "", "FantasyPoints": 0}, {"Name": "", "FantasyPoints": 0}, {"Name": "", "FantasyPoints": 0}]
+	for(k=0; k<10; k++) {
+		if (top10Array[k].FantasyPoints == undefined) {
+			top10Array[k].FantasyPoints = 0;
+			top10Array[k].Name = "";
+		}
+	}
 	for(j=0; j<allPlayers.length; j++) {
-		for(k=0; k<10; k++) {
+		for(k=0; k<top10Array.length; k++) {
 			if (top10Array[k].FantasyPoints < allPlayers[j].getFantasyPoints()) {
-				top10Array[k].FantasyPoints = allPlayers[j].getFantasyPoints();
-				top10Array[k].Name = allPlayers[j].getName();
+				top10Array.splice(k,0,{"Name": allPlayers[j].getName(), "FantasyPoints": allPlayers[j].getFantasyPoints()});
+				break
 			}
 		}
 	}
