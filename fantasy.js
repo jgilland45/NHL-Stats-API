@@ -16,7 +16,7 @@ class Player {
 		this.id = id;
 		this.position = position;
 		this.fantasyPoints = 0;
-		if (this.position=='G') {
+		if (position == "G") {
 			this.ga = 0;
 			this.saves = 0;
 			this.wins = 0;
@@ -74,7 +74,7 @@ class Player {
 	}
 
 	getStats(playerPosition) {
-		if (playerPosition == 'G') {
+		if (playerPosition == "G") {
 			return [this.ga, this.saves, this.gamesPlayed, this.wins, this.shutouts];
 		}
 		else {
@@ -176,7 +176,6 @@ function getAllPlayerLinks() {
 
 function getPlayerStats() {
     displayLoading();
-	//purgeUndefinedPlayers();
 	for(i=0;i<allPlayers.length;i++) {
 		getIndividualPlayerStats(i);
 	}
@@ -188,7 +187,7 @@ function getIndividualPlayerStats(i) {
 	axios.get('https://statsapi.web.nhl.com/' + 'api/v1/people/' + allPlayers[i].getID() + '/stats?stats=statsSingleSeason&season=20222023')
 			.then((response) => {
 				console.log("PLAYER " + i + " NAME = " + allPlayers[i].name);
-				if (allPlayers[i].getPosition == "G") {
+				if (allPlayers[i].getPosition() == "G") {
 					var gamesPlayed = response.data.stats[0].splits[0].stat.games;
 					var ga = response.data.stats[0].splits[0].stat.goalsAgainst;
 					var saves = response.data.stats[0].splits[0].stat.saves;
@@ -228,8 +227,10 @@ function getIndividualPlayerStats(i) {
 
 function printTop10Fantasy() {
 	for(i=0; i<allPlayers.length;i++) {
-		if(allPlayers[i].getPosition() == 'G') {
+		if(allPlayers[i].getPosition() == "G") {
 			var statsArray = allPlayers[i].getStats('G');
+			var fantasyPoints = (statsArray[0]*-3)+(statsArray[1]*0.6)+(statsArray[3]*5)+(statsArray[4]*5);
+			allPlayers[i].setFantasyPoints(fantasyPoints);
 		}
 		else {
 			var statsArray = allPlayers[i].getStats('NG');
