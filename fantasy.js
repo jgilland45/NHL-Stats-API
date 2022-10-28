@@ -180,10 +180,93 @@ function getAllTeamIds() {
 function getWeeklySchedule(k) {
 	displayLoading();
 	currentDate = new Date();
-	console.log(currentDate.getMonth()+1);
-	console.log(currentDate.getDate());
-	console.log(currentDate.getDay());
-	console.log(currentDate.getFullYear());
+	var endOfWeekDate = {};
+	if ((((currentDate.getMonth()+1) < 7) && ((currentDate.getMonth()+1) % 2 == 1)) || (((currentDate.getMonth()+1) > 6) && ((currentDate.getMonth()+1) % 2 == 0))) {
+		console.log("THIS IS A MONTH WITH 31 DAYS");
+		if ((currentDate.getDate() + (7-currentDate.getDay()) <= 31)) {
+			var month = currentDate.getMonth()+1;
+			var day = currentDate.getDate() + (7-currentDate.getDay());
+			var year = currentDate.getFullYear();
+		}
+		else {
+			if (currentDate.getMonth() == 12) {
+				var month = 1;
+				var year = currentDate.getFullYear()+1;
+			}
+			else {
+				var month = currentDate.getMonth()+2;
+				var year = currentDate.getFullYear();
+			}
+			var day = 7-(31-currentDate.getDate())-currentDate.getDay();
+		}
+		endOfWeekDate.month = month;
+		endOfWeekDate.day = day;
+		endOfWeekDate.year = year;
+		console.log("END OF WEEK MONTH " + endOfWeekDate.month);
+		console.log("END OF WEEK DAY " + endOfWeekDate.day);
+		console.log("END OF WEEK YEAR " + endOfWeekDate.year);
+	}
+	else if ((currentDate.getMonth()+1) == 2) {
+		if(currentDate.getFullYear() % 4 == 0) {
+			console.log('THIS IS A LEAP YEAR');
+			if ((currentDate.getDate() + (7-currentDate.getDay()) <= 29)) {
+				var month = currentDate.getMonth()+1;
+				var day = currentDate.getDate() + (7-currentDate.getDay());
+				var year = currentDate.getFullYear();
+			}
+			else {
+				if (currentDate.getMonth() == 12) {
+					var month = 1;
+					var year = currentDate.getFullYear()+1;
+				}
+				else {
+					var month = currentDate.getMonth()+2;
+					var year = currentDate.getFullYear();
+				}
+				var day = 7-(29-currentDate.getDate())-currentDate.getDay();
+			}
+		}
+		else {
+			console.log("THIS IS NOT A LEAP YEAR");
+			if ((currentDate.getDate() + (7-currentDate.getDay()) <= 28)) {
+				var month = currentDate.getMonth()+1;
+				var day = currentDate.getDate() + (7-currentDate.getDay());
+				var year = currentDate.getFullYear();
+			}
+			else {
+				if (currentDate.getMonth() == 12) {
+					var month = 1;
+					var year = currentDate.getFullYear()+1;
+				}
+				else {
+					var month = currentDate.getMonth()+2;
+					var year = currentDate.getFullYear();
+				}
+				var day = 7-(28-currentDate.getDate())-currentDate.getDay();
+			}
+		}
+		console.log("THIS IS FEBRUARY");
+	}
+	else {
+		console.log("THIS IS A MONTH WITH 30 DAYS");
+		if ((currentDate.getDate() + (7-currentDate.getDay()) <= 31)) {
+			var month = currentDate.getMonth()+1;
+			var day = currentDate.getDate() + (7-currentDate.getDay());
+			var year = currentDate.getFullYear();
+		}
+		else {
+			if (currentDate.getMonth() == 12) {
+				var month = 1;
+				var year = currentDate.getFullYear()+1;
+			}
+			else {
+				var month = currentDate.getMonth()+2;
+				var year = currentDate.getFullYear();
+			}
+			var day = 7-(31-currentDate.getDate())-currentDate.getDay();
+		}
+	}
+	endOfWeekDate.month = 'yes';
 
 	axios.get('https://statsapi.web.nhl.com/api/v1/schedule' + '?teamId=' + allTeams[k].getID() + '&startDate=' + currentDate.getFullYear() + '-' + (currentDate.getMonth()+1).toString() + '-' + currentDate.getDate())
 		.then((response) => {
