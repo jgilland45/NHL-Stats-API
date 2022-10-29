@@ -6,7 +6,7 @@ class Team {
 	constructor(name, id) {
 		this.name = name;
 		this.id = id;
-		this.games = 0;
+		this.games = [];
 	}
 
 	setGamesInWeek(games) {
@@ -19,6 +19,10 @@ class Team {
 
 	getID() {
 		return this.id;
+	}
+
+	getName() {
+		return this.name;
 	}
 }
 
@@ -143,7 +147,7 @@ function displayLoading() {
 // hiding loading 
 function hideLoading() {
     //loader.classList.remove("display");
-		loader.style.display = 'none'
+		loader.style.display = 'none';
 }
 
 //resets all of the arrays
@@ -189,7 +193,8 @@ function getWeeklySchedule(k) {
 			var year = currentDate.getFullYear();
 		}
 		else {
-			if (currentDate.getMonth() == 12) {
+			if ((currentDate.getMonth()+1) == 12) {
+				console.log("THIS IS DECEMBER");
 				var month = 1;
 				var year = currentDate.getFullYear()+1;
 			}
@@ -202,9 +207,9 @@ function getWeeklySchedule(k) {
 		endOfWeekDate.month = month;
 		endOfWeekDate.day = day;
 		endOfWeekDate.year = year;
-		console.log("END OF WEEK MONTH " + endOfWeekDate.month);
+		/*console.log("END OF WEEK MONTH " + endOfWeekDate.month);
 		console.log("END OF WEEK DAY " + endOfWeekDate.day);
-		console.log("END OF WEEK YEAR " + endOfWeekDate.year);
+		console.log("END OF WEEK YEAR " + endOfWeekDate.year);*/
 	}
 	else if ((currentDate.getMonth()+1) == 2) {
 		if(currentDate.getFullYear() % 4 == 0) {
@@ -245,11 +250,17 @@ function getWeeklySchedule(k) {
 				var day = 7-(28-currentDate.getDate())-currentDate.getDay();
 			}
 		}
+		endOfWeekDate.month = month;
+		endOfWeekDate.day = day;
+		endOfWeekDate.year = year;
+		/*console.log("END OF WEEK MONTH " + endOfWeekDate.month);
+		console.log("END OF WEEK DAY " + endOfWeekDate.day);
+		console.log("END OF WEEK YEAR " + endOfWeekDate.year);*/
 		console.log("THIS IS FEBRUARY");
 	}
 	else {
 		console.log("THIS IS A MONTH WITH 30 DAYS");
-		if ((currentDate.getDate() + (7-currentDate.getDay()) <= 31)) {
+		if ((currentDate.getDate() + (7-currentDate.getDay()) <= 30)) {
 			var month = currentDate.getMonth()+1;
 			var day = currentDate.getDate() + (7-currentDate.getDay());
 			var year = currentDate.getFullYear();
@@ -263,14 +274,35 @@ function getWeeklySchedule(k) {
 				var month = currentDate.getMonth()+2;
 				var year = currentDate.getFullYear();
 			}
-			var day = 7-(31-currentDate.getDate())-currentDate.getDay();
+			var day = 7-(30-currentDate.getDate())-currentDate.getDay();
 		}
+		endOfWeekDate.month = month;
+		endOfWeekDate.day = day;
+		endOfWeekDate.year = year;
+		/*console.log("END OF WEEK MONTH " + endOfWeekDate.month);
+		console.log("END OF WEEK DAY " + endOfWeekDate.day);
+		console.log("END OF WEEK YEAR " + endOfWeekDate.year);*/
 	}
-	endOfWeekDate.month = 'yes';
 
-	axios.get('https://statsapi.web.nhl.com/api/v1/schedule' + '?teamId=' + allTeams[k].getID() + '&startDate=' + currentDate.getFullYear() + '-' + (currentDate.getMonth()+1).toString() + '-' + currentDate.getDate())
+	//console.log(currentDate);
+	//console.log(endOfWeekDate);
+	
+	axios.get('https://statsapi.web.nhl.com/api/v1/schedule' + '?teamId=' + allTeams[k].getID() + '&startDate=' + currentDate.getFullYear() + '-' + (currentDate.getMonth()+1).toString() + '-' + currentDate.getDate() + '&endDate=' + endOfWeekDate.year + '-' + endOfWeekDate.month + '-' + endOfWeekDate.day)
 		.then((response) => {
+			var numGames = response.data.dates.length;
+			//console.log("NUMGAMES: " + numGames);
+			var games = [];
+			for (i=0;i<numGames;i++) {
+				if (response.data.dates[0].games[0].teams.away.team.name == allTeams[k].getName()) {
+					games.push({'opponent': response.data.dates[i].games[0].teams.home.team.name});
+				}
+				else {
+					games.push({'opponent': response.data.dates[i].games[0].teams.away.team.name});
+				}
+			}
+			allTeams[k].setGamesInWeek(games);
 			if(k==allTeams.length-1) {
+				console.log(allTeams);
 				getAllPlayerLinks();
 			}
 		})
@@ -287,7 +319,7 @@ function getAllPlayerLinks() {
                 }
 				numPlayers+=response.data.teams[i].roster.roster.length;
             }
-            console.log(allPlayers)
+            console.log(allPlayers);
 			getPlayerStats();
         })
     hideLoading();
