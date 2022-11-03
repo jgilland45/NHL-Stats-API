@@ -32,6 +32,7 @@ class Player {
 		this.id = id;
 		this.position = position;
 		this.fantasyPoints = 0;
+		this.projected = 0;
 		this.team = team;
 		if (position == "G") {
 			this.ga = 0;
@@ -84,6 +85,14 @@ class Player {
 
 	setFantasyPoints(fantasyPoints) {
 		this.fantasyPoints = fantasyPoints;
+	}
+
+	setProjected(projected) {
+		this.projected = projected;
+	}
+
+	getProjected() {
+		return this.projected;
 	}
 
 	getFantasyPoints() {
@@ -158,7 +167,6 @@ numPlayers = 0;
 }
 
 
-//when the sixth button is clicked
 function fantasy() {
 	reset();
     getAllTeamIds();
@@ -415,6 +423,23 @@ function printTop10Fantasy() {
 	}
 	console.log(top10Array);
 	//document.getElementById('showFantasy').innerHTML = toString(top10Array.FantasyPoints) + top10Array.Name;
+}
+
+function projections() {
+	var top10Array = [{"Name": "", "FantasyPoints": 0}, {"Name": "", "FantasyPoints": 0}, {"Name": "", "FantasyPoints": 0}, {"Name": "", "FantasyPoints": 0}, {"Name": "", "FantasyPoints": 0}, {"Name": "", "FantasyPoints": 0}, {"Name": "", "FantasyPoints": 0}, {"Name": "", "FantasyPoints": 0}, {"Name": "", "FantasyPoints": 0}, {"Name": "", "FantasyPoints": 0}]
+	
+	for(j=0; j<allPlayers.length; j++) {
+		for(k=0; k<top10Array.length; k++) {
+			allPlayers[j].setProjected((allPlayers[j].getFantasyPoints() / allPlayers[j].getGamesPlayed()) * allPlayers[j].team.getGamesInWeek().length)
+			if (top10Array[k].FantasyPoints < allPlayers[j].getProjected()) {
+				top10Array.splice(k,0,{"Player": allPlayers[j], "FantasyPoints": (allPlayers[j].getProjected())});
+				break
+			}
+		}
+	}
+	for(j=0; j<10; j++) {
+		console.log(top10Array[j]);
+	}
 }
 
 /*
