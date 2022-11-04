@@ -191,6 +191,7 @@ function getAllTeamIds() {
 
 function getWeeklySchedule(k) {
 	displayLoading();
+	// date works like YEAR-MONTH-DAY
 	currentDate = new Date();
 	var endOfWeekDate = {};
 	if ((((currentDate.getMonth()+1) < 7) && ((currentDate.getMonth()+1) % 2 == 1)) || (((currentDate.getMonth()+1) > 6) && ((currentDate.getMonth()+1) % 2 == 0))) {
@@ -426,18 +427,18 @@ function printTop10Fantasy() {
 }
 
 function projections() {
-	var top10Array = [{"Name": "", "FantasyPoints": 0}, {"Name": "", "FantasyPoints": 0}, {"Name": "", "FantasyPoints": 0}, {"Name": "", "FantasyPoints": 0}, {"Name": "", "FantasyPoints": 0}, {"Name": "", "FantasyPoints": 0}, {"Name": "", "FantasyPoints": 0}, {"Name": "", "FantasyPoints": 0}, {"Name": "", "FantasyPoints": 0}, {"Name": "", "FantasyPoints": 0}]
+	var top10Array = [{"Name": "", "Player": new Player(), "FantasyPoints": 0}, {"Name": "", "Player": new Player(), "FantasyPoints": 0}, {"Name": "", "Player": new Player(), "FantasyPoints": 0}, {"Name": "", "Player": new Player(), "FantasyPoints": 0}, {"Name": "", "Player": new Player(), "FantasyPoints": 0}, {"Name": "", "Player": new Player(), "FantasyPoints": 0}, {"Name": "", "Player": new Player(), "FantasyPoints": 0}, {"Name": "", "Player": new Player(), "FantasyPoints": 0}, {"Name": "", "Player": new Player(), "FantasyPoints": 0}, {"Name": "", "Player": new Player(), "FantasyPoints": 0}]
 	
 	for(j=0; j<allPlayers.length; j++) {
 		for(k=0; k<top10Array.length; k++) {
 			allPlayers[j].setProjected((allPlayers[j].getFantasyPoints() / allPlayers[j].getGamesPlayed()) * allPlayers[j].team.getGamesInWeek().length)
 			if (top10Array[k].FantasyPoints < allPlayers[j].getProjected()) {
-				top10Array.splice(k,0,{"Player": allPlayers[j], "FantasyPoints": (allPlayers[j].getProjected())});
+				top10Array.splice(k,0,{"Name": allPlayers[j].getName(),"Player": allPlayers[j], "FantasyPoints": (allPlayers[j].getProjected())});
 				break
 			}
 		}
 	}
-	for(j=0; j<10; j++) {
+	for(j=0; j<100; j++) {
 		console.log(top10Array[j]);
 	}
 }
