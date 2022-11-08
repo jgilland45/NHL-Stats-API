@@ -361,3 +361,10 @@ p {
         transform: rotate(360deg);
     }
 }
+
+#showTopPlayersWrapper {
+  margin: auto;
+	height: 80%;
+	width: 50%;
+  overflow: scroll;
+}

@@ -27,12 +27,13 @@
 		</div>
 		<div id='content'>
 			<div id="loading"></div>
-			<p id='showFantasy' style='font-size: 100%'>Fantasy yeah</p>
+			<p id='showFantasy' style='font-size: 100%'></p>
 			<!--cool button animations from https://webdeasy.de/en/top-css-buttons-en/-->
 			<div id='buttonDiv'>
 				<button class="glow-on-hover" onclick="fantasy()">Best Fantasy Players</button>
-				<button class="glow-on-hover" onclick="projections()">Projected Top Fantasy Players</button>
 			</div>
+			<div id='showTopPlayersWrapper' style="overflow: scroll;">
+				<p id='showTopPlayers'></p></div>
 		</div>
 		<div id='footer'><p id='copy'>&copy; Jason Gillanders 2021, All Rights Reserved</p></div>
 		<script src="https://unpkg.com/axios/dist/axios.min.js"></script>

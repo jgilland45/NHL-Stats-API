@@ -186,11 +186,9 @@ function getAllTeamIds() {
 			}
             console.log(allTeams);
         })
-    hideLoading();
 }
 
 function getWeeklySchedule(k) {
-	displayLoading();
 	// date works like YEAR-MONTH-DAY
 	currentDate = new Date();
 	var endOfWeekDate = {};
@@ -315,11 +313,9 @@ function getWeeklySchedule(k) {
 				getAllPlayerLinks();
 			}
 		})
-	hideLoading();
 }
 
 function getAllPlayerLinks() {
-    displayLoading();
     axios.get('https://statsapi.web.nhl.com/' + 'api/v1/teams/' + '?teamId=' + "&expand=team.roster")
 		.then((response) => {
             for(i=0;i<allTeams.length;i++) {
@@ -331,16 +327,13 @@ function getAllPlayerLinks() {
             console.log(allPlayers);
 			getPlayerStats();
         })
-    hideLoading();
 }
 
 function getPlayerStats() {
-    displayLoading();
 	for(i=0;i<allPlayers.length;i++) {
 		getIndividualPlayerStats(i);
 	}
 	console.log(allPlayers)
-    hideLoading();
 }
 
 function getIndividualPlayerStats(i) {
@@ -384,6 +377,7 @@ function getIndividualPlayerStats(i) {
 				
 				if(i==allPlayers.length-1) {
 					printTop10Fantasy();
+					projections();
 				}
 			})
 		
@@ -427,6 +421,8 @@ function printTop10Fantasy() {
 }
 
 function projections() {
+	const p = document.getElementById('showTopPlayers');
+	p.insertAdjacentHTML('beforeend', 'Player Name --- Projected Fantasy Points for Rest of Week<br>');
 	var top10Array = [{"Name": "", "Player": new Player(), "FantasyPoints": 0}, {"Name": "", "Player": new Player(), "FantasyPoints": 0}, {"Name": "", "Player": new Player(), "FantasyPoints": 0}, {"Name": "", "Player": new Player(), "FantasyPoints": 0}, {"Name": "", "Player": new Player(), "FantasyPoints": 0}, {"Name": "", "Player": new Player(), "FantasyPoints": 0}, {"Name": "", "Player": new Player(), "FantasyPoints": 0}, {"Name": "", "Player": new Player(), "FantasyPoints": 0}, {"Name": "", "Player": new Player(), "FantasyPoints": 0}, {"Name": "", "Player": new Player(), "FantasyPoints": 0}]
 	
 	for(j=0; j<allPlayers.length; j++) {
@@ -440,7 +436,9 @@ function projections() {
 	}
 	for(j=0; j<100; j++) {
 		console.log(top10Array[j]);
+		p.insertAdjacentHTML('beforeend', top10Array[j].Name + ' --- ' + top10Array[j].FantasyPoints + '<br>');
 	}
+	hideLoading();
 }
 
 /*
